@@ -2,9 +2,7 @@ package com.github.artemy.kotlin.sandbox.kotlinreactive.fruits
 
 import com.github.artemy.kotlin.sandbox.kotlinreactive.domain.Fruit
 import com.github.artemy.kotlin.sandbox.kotlinreactive.domain.FruitRequest
-import com.github.artemy.kotlin.sandbox.kotlinreactive.domain.FruitStatistics
 import com.github.artemy.kotlin.sandbox.kotlinreactive.ifDebug
-import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.ResponseEntity
@@ -23,22 +21,21 @@ class FruitController(private val fruitService: FruitService) {
     private val log by lazy { LoggerFactory.getLogger(javaClass) }
 
     @PostMapping
-    suspend fun saveFruit(@RequestBody fruitRequest: FruitRequest): ResponseEntity<String> {
-        fruitService.saveFruit(Fruit(fruitRequest.name)).awaitFirstOrNull()
-            ?: return ResponseEntity.status(INTERNAL_SERVER_ERROR).build()
-
-        return ok().build<String>().also { log.ifDebug("Stored {}", fruitRequest) }
-    }
+    fun saveFruit(@RequestBody fruitRequest: FruitRequest) =
+        fruitService.saveFruit(Fruit(fruitRequest.name))
+            .map { ok().build<String>() }
+            .doOnSuccess { log.ifDebug("Stored {}", fruitRequest) }
+            .onErrorReturn(ResponseEntity.status(INTERNAL_SERVER_ERROR).build())
 
     @GetMapping
-    suspend fun getFruitsStatisticsOverall(): ResponseEntity<FruitStatistics> {
-        return ok().body(fruitService.getStatisticsOverall())
-            .also { log.ifDebug("Returning overall statistics") }
-    }
+    fun getFruitsStatisticsOverall() =
+        fruitService.getStatisticsOverall()
+            .map { ok().body(it) }
+            .doOnSuccess { log.ifDebug("Returning overall statistics") }
 
     @GetMapping(params = ["name"])
-    suspend fun getFruitsStatistics(@RequestParam("name") fruitName: String): ResponseEntity<FruitStatistics> {
-        return ok().body(fruitService.getStatisticsForFruit(fruitName))
-            .also { log.ifDebug("Returning overall statistics for fruit {}", fruitName) }
-    }
+    fun getFruitsStatistics(@RequestParam("name") fruitName: String) =
+        fruitService.getStatisticsForFruit(fruitName)
+            .map { ok().body(it) }
+            .doOnSuccess { log.ifDebug("Returning overall statistics for fruit {}", fruitName) }
 }

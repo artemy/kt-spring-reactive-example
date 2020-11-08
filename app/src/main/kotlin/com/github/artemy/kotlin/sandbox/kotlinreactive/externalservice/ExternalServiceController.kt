@@ -15,11 +15,8 @@ class ExternalServiceController(private val externalServiceService: ExternalServ
     private val log by lazy { LoggerFactory.getLogger(javaClass) }
 
     @PostMapping
-    suspend fun retrieveItems(): ResponseEntity<String> {
-        val item = externalServiceService.externalCall()
-            ?: return ResponseEntity.status(BAD_GATEWAY).body("Unable to retrieve item")
-
-        return ok().body(item)
-            .also { log.ifDebug("Retrieved item {}", item) }
-    }
+    fun retrieveItems() = externalServiceService.externalCall()
+        .map { ok().body(it) }
+        .doOnSuccess { log.ifDebug("Retrieved item {}", it) }
+        .onErrorReturn(ResponseEntity.status(BAD_GATEWAY).body("Unable to retrieve item"))
 }
