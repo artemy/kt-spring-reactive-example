@@ -1,0 +1,32 @@
+version: '2'
+services:
+  app:
+    build: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - external-stub
+    networks:
+      - fruit-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+  external-stub:
+    build: external-stub
+    expose:
+      - 8080
+    networks:
+      - fruit-network
+  postgres:
+    image: postgres:13.0-alpine
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_DB=kotlin
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - fruit-network
+networks:
+  fruit-network:
+    driver: bridge

@@ -1,0 +1,7 @@
+database:
+  connection-string: postgresql://postgres:5432/kotlin
+  username: postgres
+  password: postgres
+
+app.backends.external:
+  url: http://external-stub:8080/

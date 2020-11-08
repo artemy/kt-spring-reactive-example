@@ -1,0 +1,10 @@
+POST http://{{host}}/fruits
+Content-Type: application/json
+
+{
+  "name": "banana"
+}
+
+###
+GET http://{{host}}/fruits
+

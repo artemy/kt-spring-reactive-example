@@ -1,0 +1,22 @@
+database:
+  connection-string: postgresql://localhost:5432/kotlin
+  username: postgres
+  password: postgres
+
+spring:
+  application.name: kotlin-reactive-backend
+  r2dbc:
+    url: r2dbc:${database.connection-string}
+    username: ${database.username}
+    password: ${database.password}
+  flyway:
+    url: jdbc:${database.connection-string}
+    user: ${database.username}
+    password: ${database.password}
+
+
+app.backends.external:
+  url: http://localhost:8081
+
+logging.level:
+  root: INFO

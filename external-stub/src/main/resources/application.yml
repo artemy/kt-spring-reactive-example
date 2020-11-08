@@ -1,0 +1,7 @@
+spring:
+  application.name: external-stub
+  main.web-application-type: none
+
+---
+spring.config.activate.on-profile: local
+http.port: 8081
